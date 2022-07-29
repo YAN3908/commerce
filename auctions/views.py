@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User, Lot, Category,Bid
+from .models import User, Lot, Category, Bid
 
 
 class NewLotForm(forms.Form):
@@ -16,9 +16,9 @@ class NewLotForm(forms.Form):
     # category = forms.ChoiceField(label="Category:", choices=[(i, i.category) for i in Category.objects.all()])
     category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()])
 
+
 def index(request):
     return render(request, "auctions/index.html", {"lots": Lot.objects.all()})
-
 
 
 def login_view(request):
@@ -72,6 +72,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
 def create_lot(request):
     user = User.objects.get(pk=int(request.user.id))
     if request.method == "POST":
@@ -102,15 +103,35 @@ def create_lot(request):
 
 
 def lot(request, lot_id):
-    lot = Lot.objects.get(pk=int(lot_id))
-    class bid(forms.Form):
-        starting_price = forms.IntegerField(label="Starting price:", min_value=int(lot.starting_price)+1, initial=lot.starting_price)
+    if request.user.is_authenticated:
+        user = User.objects.get(pk=int(request.user.id))
+    lot = Lot.objects.filter(pk=int(lot_id)).first()
+    if lot.price.first():
+        min_value = int(lot.price.last().price) + 1
+        initial = int(lot.price.last().price)
+
+        # print(lot.price.last().price)
+    else:
+        min_value = int(lot.starting_price) + 1
+        initial = int(lot.starting_price)
+        print('work')
+
+    class Bid_forms(forms.Form):
+        bid = forms.IntegerField(label="Bid:", min_value=min_value, initial=initial)
+
     if request.method == "POST":
-        form = bid(request.POST)
+        form = Bid_forms(request.POST)
         if form.is_valid():
-            lot.starting_price = form.cleaned_data["starting_price"]
-            lot.save()
+            recBid = Bid(
+                user=user,
+                price=form.cleaned_data['bid']
+            )
+            recBid.save()
+            lot.price.add(recBid)
+
+            # lot.starting_price = form.cleaned_data["starting_price"]
+            # lot.save()
             return HttpResponseRedirect(reverse('lot', args=(lot_id,)))
         else:
             return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
-    return render(request, "auctions/lot_page.html", {"lot": lot, "form": bid})
+    return render(request, "auctions/lot_page.html", {"lot": lot, "form": Bid_forms})
