@@ -6,6 +6,9 @@
             <h2>{{lot.lot_name}}</h2>
             <p>{{lot.description}}</p>
             <h3>Starting price{{lot.starting_price}}</h3>
+            {%if lot.price.all.last.price %}
+            <h3>Last bid{{lot.price.all.last.price}}</h3>
+            {%endif%}
             {% if user.is_authenticated %}
             <form action="{% url 'lot' lot.id %}" method="post">
                 {% csrf_token %}
