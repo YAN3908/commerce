@@ -106,6 +106,7 @@ def lot(request, lot_id):
     if request.user.is_authenticated:
         user = User.objects.get(pk=int(request.user.id))
     lot = Lot.objects.filter(pk=int(lot_id)).first()
+    print(lot.price.order_by("-id")[0:5]) #############################
     if lot.price.first():
         min_value = int(lot.price.last().price) + 1
         initial = int(lot.price.last().price)
