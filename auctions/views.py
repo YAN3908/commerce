@@ -56,13 +56,13 @@ def register(request, lot_id=0):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
-
+        form = PageInit(request.POST)
         # Ensure password matches confirmation
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
             return render(request, "auctions/register.html", {
-                "message": "Passwords must match."
+                "message": "Passwords must match.", "form": form
             })
 
         # Attempt to create new user
@@ -71,7 +71,7 @@ def register(request, lot_id=0):
             user.save()
         except IntegrityError:
             return render(request, "auctions/register.html", {
-                "message": "Username already taken.", "form": PageInit
+                "message": "Username already taken.", "form": form
             })
         login(request, user)
 
@@ -81,6 +81,7 @@ def register(request, lot_id=0):
         else:
             return HttpResponseRedirect(reverse("lot", args=(page,)))
     else:
+
         return render(request, "auctions/register.html", {"form": PageInit})
 
 
