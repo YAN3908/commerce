@@ -51,8 +51,8 @@ def register(request, lot_id=0):
     class PageInit(forms.Form):
         page = forms.IntegerField(widget=forms.HiddenInput(), initial=lot_id)
 
-    print(lot_id)
-    print(request.GET)
+    # print(lot_id)
+    # print(request.GET)
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -71,11 +71,12 @@ def register(request, lot_id=0):
             user.save()
         except IntegrityError:
             return render(request, "auctions/register.html", {
-                "message": "Username already taken."
+                "message": "Username already taken.", "form": PageInit
             })
         login(request, user)
+
         page = request.POST["page"]
-        if page == 0:
+        if page == '0':
             return HttpResponseRedirect(reverse("index"))
         else:
             return HttpResponseRedirect(reverse("lot", args=(page,)))
@@ -124,7 +125,7 @@ def lot(request, lot_id):
     else:
         min_value = int(lot.starting_price) + 1
         initial = int(lot.starting_price)
-        print('work')
+        # print('work')
 
     class Bid_forms(forms.Form):
         bid = forms.IntegerField(label="Bid:", min_value=min_value, initial=initial)
