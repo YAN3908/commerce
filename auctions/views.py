@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
@@ -46,7 +47,12 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("index"))
 
 
-def register(request):
+def register(request, lot_id=0):
+    class PageInit(forms.Form):
+        page = forms.IntegerField(widget=forms.HiddenInput(), initial=lot_id)
+
+    print(lot_id)
+    print(request.GET)
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -68,13 +74,18 @@ def register(request):
                 "message": "Username already taken."
             })
         login(request, user)
-        return HttpResponseRedirect(reverse("index"))
+        page = request.POST["page"]
+        if page == 0:
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return HttpResponseRedirect(reverse("lot", args=(page,)))
     else:
-        return render(request, "auctions/register.html")
+        return render(request, "auctions/register.html", {"form": PageInit})
 
 
 def create_lot(request):
     user = User.objects.get(pk=int(request.user.id))
+
     if request.method == "POST":
         # print(request.POST)
         form = NewLotForm(request.POST)
@@ -103,10 +114,8 @@ def create_lot(request):
 
 
 def lot(request, lot_id):
-    if request.user.is_authenticated:
-        user = User.objects.get(pk=int(request.user.id))
     lot = Lot.objects.filter(pk=int(lot_id)).first()
-    print(lot.price.order_by("-id")[0:5]) #############################
+    # print(lot.price.order_by("-id")[0:5]) #############################
     if lot.price.first():
         min_value = int(lot.price.last().price) + 1
         initial = int(lot.price.last().price)
@@ -121,18 +130,22 @@ def lot(request, lot_id):
         bid = forms.IntegerField(label="Bid:", min_value=min_value, initial=initial)
 
     if request.method == "POST":
-        form = Bid_forms(request.POST)
-        if form.is_valid():
-            recBid = Bid(
-                user=user,
-                price=form.cleaned_data['bid']
-            )
-            recBid.save()
-            lot.price.add(recBid)
+        if request.user.is_authenticated:
+            user = User.objects.get(pk=int(request.user.id))
+            form = Bid_forms(request.POST)
+            if form.is_valid():
+                recBid = Bid(
+                    user=user,
+                    price=form.cleaned_data['bid']
+                )
+                recBid.save()
+                lot.price.add(recBid)
 
-            # lot.starting_price = form.cleaned_data["starting_price"]
-            # lot.save()
-            return HttpResponseRedirect(reverse('lot', args=(lot_id,)))
+                # lot.starting_price = form.cleaned_data["starting_price"]
+                # lot.save()
+                return HttpResponseRedirect(reverse('lot', args=(lot_id,)))
+            else:
+                return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
         else:
-            return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
+            return HttpResponseRedirect(reverse("registerlot", args=(lot_id,)))
     return render(request, "auctions/lot_page.html", {"lot": lot, "form": Bid_forms})

@@ -5,7 +5,10 @@
 
        <form action="{% url 'create_lot' %}" method="post">
         {% csrf_token %}
-        {{form}}
+        {% for field in form %}
+           {{field.label_tag}}
+        <div class="form-group">{{field}}</div>
+           {% endfor %}
         <input type="submit" value="Create lot">
     </form>
 {% endblock %}

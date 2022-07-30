@@ -11,19 +11,17 @@
             {% else %}
             <img src="{{lot.picture}}" >
             {%endif%}
-            {% if user.is_authenticated %}
+
             <form action="{% url 'lot' lot.id %}" method="post">
                 {% csrf_token %}
                 {{form}}
             <input type="submit" value="bid">
             </form>
-            {%else%}
-            <h3>Prise {{lot.price.all.last.price}}</h3>
-            {% endif %}
+
             <p>{{lot.description}}</p>
             <h3>Starting price {{lot.starting_price}} salesman {{lot.userLot}} </h3>
             {%if lot.price.all.last.price %}
-                {%for bid in lot.price.all%}  
+                {%for bid in lot.price.all%}
                 <h5> {{bid.price}} {{bid.user}}</h5>
             {% endfor %}
             {%endif%}

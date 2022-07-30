@@ -33,20 +33,22 @@
                     <a class="nav-link" href="{% url 'login' %}">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+
+                    <a class="nav-link"  name="q" href="{% url 'register' %} ">Register</a>
                 </li>
 
             {% endif %}
+            <select style="width:130px;" onchange="change_url(this.value);">
+            <option value="http://www.url1.com">Option 1</option>
+            <option value="http://www.url2.com">Option 2</option>
+            </select>
 
     <script type="text/javascript">
         function change_url(val) {
             window.location=val;
         }
     </script>
-    <select style="width:130px;" onchange="change_url(this.value);">
-            <option value="http://www.url1.com">Option 1</option>
-            <option value="http://www.url2.com">Option 2</option>
-     </select>
+
 
 
         </ul>
