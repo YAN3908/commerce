@@ -19,8 +19,14 @@ class NewLotForm(forms.Form):
 
 
 def index(request):
-    return render(request, "auctions/index.html", {"lots": Lot.objects.all()})
+    # print(category)
+    return render(request, "auctions/index.html", {"lots": Lot.objects.all(), 'categories': Category.objects.all()})
 
+def category(request, category):
+    print(Category.objects.first())
+
+    category_object=Category.objects.filter(category=category).first()
+    return render(request, "auctions/index.html", {"lots": Lot.objects.filter(category=category_object).all(), 'categories': Category.objects.all()})
 
 def login_view(request):
     if request.method == "POST":
