@@ -1,10 +1,14 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    {% if category%}
+    <h2>{{category}}, active Listings</h2>
+    {% else %}
+    <h2>All active Listings</h2>
+    {% endif %}
     {% for lot in lots%}
     <a href="{% url 'lot' lot.id %}">
-        <div class="btn-group icon" style=" margin:10px; border-style: solid; border-width: 5px; border-color: rgba(183, 197, 255, 0.4); width: 500px; height: 350px; text-align: center; display:inline-block">
+        <div class="btn-group icon" style=" margin:10px; border-style: solid; border-width: 5px; border-color: rgba(183, 197, 255, 0.4); width: 600px; height: 350px; text-align: center; display:inline-block">
             <h2>{{lot.lot_name}}</h2>
             <h3>{{lot.description}}</h3>
             {%if lot.price.all.last.price %}
@@ -17,7 +21,9 @@
             {% else %}
             <img src="{{lot.picture}}" >
             {%endif%}
+             {% if not category%}
             <h3>{{lot.category.category}}</h3>
+            {%endif%}
         </div>
     </a>
     {% endfor %}

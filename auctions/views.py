@@ -22,11 +22,12 @@ def index(request):
     # print(category)
     return render(request, "auctions/index.html", {"lots": Lot.objects.all(), 'categories': Category.objects.all()})
 
-def category(request, category):
-    print(Category.objects.first())
 
-    category_object=Category.objects.filter(category=category).first()
-    return render(request, "auctions/index.html", {"lots": Lot.objects.filter(category=category_object).all(), 'categories': Category.objects.all()})
+def category(request, category):
+    category_object = Category.objects.filter(category=category).first()
+    return render(request, "auctions/index.html",
+                  {"lots": Lot.objects.filter(category=category_object).all(), 'categories': Category.objects.all(), 'category': category.title()})
+
 
 def login_view(request):
     if request.method == "POST":
@@ -45,7 +46,7 @@ def login_view(request):
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "auctions/login.html")
+        return render(request, "auctions/login.html", {'categories': Category.objects.all()})
 
 
 def logout_view(request):
@@ -88,7 +89,7 @@ def register(request, lot_id=0):
             return HttpResponseRedirect(reverse("lot", args=(page,)))
     else:
 
-        return render(request, "auctions/register.html", {"form": PageInit})
+        return render(request, "auctions/register.html", {"form": PageInit, 'categories': Category.objects.all()})
 
 
 def create_lot(request):
@@ -116,9 +117,9 @@ def create_lot(request):
                 print(lot.lot_name)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "auctions/create_lot.html", {'form': form})
+            return render(request, "auctions/create_lot.html", {'form': form, 'categories': Category.objects.all()})
 
-    return render(request, "auctions/create_lot.html", {'form': NewLotForm})
+    return render(request, "auctions/create_lot.html", {'form': NewLotForm, 'categories': Category.objects.all()})
 
 
 def lot(request, lot_id):
@@ -156,4 +157,5 @@ def lot(request, lot_id):
                 return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
         else:
             return HttpResponseRedirect(reverse("registerlot", args=(lot_id,)))
-    return render(request, "auctions/lot_page.html", {"lot": lot, "form": Bid_forms})
+    return render(request, "auctions/lot_page.html",
+                  {"lot": lot, "form": Bid_forms, 'categories': Category.objects.all()})
