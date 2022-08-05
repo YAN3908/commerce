@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -14,6 +16,7 @@ class Category(models.Model):
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="biduser")
     price = models.IntegerField()
+    time_lot = models.DateTimeField(default=(datetime.now))
 
 
 class Comit(models.Model):
@@ -31,3 +34,5 @@ class Lot(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="lotcategory")
     userLot = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userLot")
     user_comit = models.ManyToManyField(Comit, blank=True, related_name="usercomit")
+    time_lot = models.DateTimeField(default=datetime.now)
+    time_sales = models.DateTimeField(default=datetime.now)

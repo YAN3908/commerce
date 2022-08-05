@@ -5,7 +5,7 @@ from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
+from datetime import datetime, timedelta
 from .models import User, Lot, Category, Bid
 
 
@@ -20,13 +20,15 @@ class NewLotForm(forms.Form):
 
 def index(request):
     # print(category)
-    return render(request, "auctions/index.html", {"lots": Lot.objects.all(), 'categories': Category.objects.all()})
+    return render(request, "auctions/index.html",
+                  {"lots": Lot.objects.all(), 'categories': Category.objects.all(), 't_Now': datetime.now()})
 
 
 def category(request, category):
     category_object = Category.objects.filter(category=category).first()
     return render(request, "auctions/index.html",
-                  {"lots": Lot.objects.filter(category=category_object).all(), 'categories': Category.objects.all(), 'category': category.title()})
+                  {"lots": Lot.objects.filter(category=category_object).all(), 'categories': Category.objects.all(),
+                   'category': category.title()})
 
 
 def login_view(request):
@@ -113,8 +115,8 @@ def create_lot(request):
             user = User.objects.get(pk=int(request.user.id))
             user.userLot.add(rec)
             lotsuser = user.userLot.all()
-            for lot in lotsuser:
-                print(lot.lot_name)
+            # for lot in lotsuser:
+            # print(lot.lot_name)
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "auctions/create_lot.html", {'form': form, 'categories': Category.objects.all()})
@@ -124,6 +126,9 @@ def create_lot(request):
 
 def lot(request, lot_id):
     lot = Lot.objects.filter(pk=int(lot_id)).first()
+
+    # if delta_time < timedelta(hours=0):
+
     # print(lot.price.order_by("-id")[0:5]) #############################
     if lot.price.first():
         min_value = int(lot.price.last().price) + 1
@@ -145,10 +150,13 @@ def lot(request, lot_id):
             if form.is_valid():
                 recBid = Bid(
                     user=user,
-                    price=form.cleaned_data['bid']
+                    price=form.cleaned_data['bid'],
+                    time_lot=datetime.now() + timedelta(hours=1.5)
                 )
                 recBid.save()
                 lot.price.add(recBid)
+                lot.time_sales = datetime.now() + timedelta(hours=1.5)
+                lot.save()
 
                 # lot.starting_price = form.cleaned_data["starting_price"]
                 # lot.save()
@@ -158,4 +166,5 @@ def lot(request, lot_id):
         else:
             return HttpResponseRedirect(reverse("registerlot", args=(lot_id,)))
     return render(request, "auctions/lot_page.html",
-                  {"lot": lot, "form": Bid_forms, 'categories': Category.objects.all()})
+                  {"lot": lot, "form": Bid_forms, 'categories': Category.objects.all(),
+                   't_Now': datetime.now()})

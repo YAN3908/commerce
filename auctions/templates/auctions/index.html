@@ -21,6 +21,15 @@
             {% else %}
             <img src="{{lot.picture}}" >
             {%endif%}
+
+            {% if lot.price.all.last %}
+            {%if lot.time_sales > t_Now  %}
+            {{lot.time_sales|timeuntil}}
+            {% else %}
+             Sales
+            {% endif %}
+            {% endif %}
+
              {% if not category%}
             <h3>{{lot.category.category}}</h3>
             {%endif%}
