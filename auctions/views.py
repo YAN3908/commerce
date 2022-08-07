@@ -1,13 +1,23 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.db.models import F
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from datetime import datetime, timedelta
 from .models import User, Lot, Category, Bid
+from django.db.models import Q
 
+
+# import schedule
+# import time
+#
+# def job_with_argument(name):
+#     print(f"I am {name}")
+#
+# schedule.every(59).seconds.do(job_with_argument, name="Peter")
 
 class NewLotForm(forms.Form):
     lot_name = forms.CharField(label="Lot name:")
@@ -19,16 +29,20 @@ class NewLotForm(forms.Form):
 
 
 def index(request):
+    lots = Lot.objects.filter(Q(price=None) | Q(time_sales__gt=datetime.now()))
+    # lots = Lot.objects.exclude(Q(price=None) | Q(time_sales__gt=datetime.now()))
+    print(lots)
+    # sales_list= Lot.objects.price.filter(price__lt=datetime.now()).all()
     # print(category)
     return render(request, "auctions/index.html",
-                  {"lots": Lot.objects.all(), 'categories': Category.objects.all(), 't_Now': datetime.now()})
-
+                  {"lots": Lot.objects.order_by(F('price').desc(nulls_first=True)), 'categories': Category.objects.all(), 't_Now': datetime.now()})
+# Lot.objects.order_by(F('price').desc(nulls_last=True))             Lot.objects.order_by('-price')
 
 def category(request, category):
     category_object = Category.objects.filter(category=category).first()
     return render(request, "auctions/index.html",
-                  {"lots": Lot.objects.filter(category=category_object).all(), 'categories': Category.objects.all(),
-                   'category': category.title()})
+                  {"lots": Lot.objects.filter(category=category_object).all().order_by('-price'), 'categories': Category.objects.all(),
+                   'category': category.title(), 't_Now': datetime.now()})
 
 
 def login_view(request):
@@ -168,3 +182,8 @@ def lot(request, lot_id):
     return render(request, "auctions/lot_page.html",
                   {"lot": lot, "form": Bid_forms, 'categories': Category.objects.all(),
                    't_Now': datetime.now()})
+
+#
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
