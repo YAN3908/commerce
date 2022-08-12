@@ -36,3 +36,9 @@ class Lot(models.Model):
     user_comit = models.ManyToManyField(Comit, blank=True, related_name="usercomit")
     time_lot = models.DateTimeField(default=datetime.now)
     time_sales = models.DateTimeField(default=datetime.now)
+    sale = models.BooleanField(default=False)
+
+    # def save(self, *args, **kwargs):
+    #     if datetime.now() >= self.time_sales:
+    #         self.sale = True
+    #     super(Lot, self).save(*args, **kwargs)

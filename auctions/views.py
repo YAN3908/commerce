@@ -1,13 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.db.models import F
+from django.db.models import F, Case, When, Value, IntegerField
 from django import forms
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import User, Lot, Category, Bid
+from .models import User, Lot, Category, Bid, Comit
 from django.db.models import Q
 
 
@@ -29,19 +29,34 @@ class NewLotForm(forms.Form):
 
 
 def index(request):
-    lots = Lot.objects.filter(Q(price=None) | Q(time_sales__gt=datetime.now()))
+    # lots = Lot.objects.filter(Q(price=None) | Q(time_sales__gt=datetime.now()))
+    timenow = datetime.now()
+    lots = Lot.objects.annotate(
+        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                       output_field=IntegerField())).distinct().order_by('lot_order')
+    # print(lots.lot_order)
+    # for lot in lots:
+    #     print(f"{lot.lot_order} - {lot.id}")
+    # print(Lot.objects.annotate(userLot__user='Yan'))
     # lots = Lot.objects.exclude(Q(price=None) | Q(time_sales__gt=datetime.now()))
     print(lots)
     # sales_list= Lot.objects.price.filter(price__lt=datetime.now()).all()
     # print(category)
     return render(request, "auctions/index.html",
-                  {"lots": Lot.objects.order_by(F('price').desc(nulls_first=True)), 'categories': Category.objects.all(), 't_Now': datetime.now()})
-# Lot.objects.order_by(F('price').desc(nulls_last=True))             Lot.objects.order_by('-price')
+                  {"lots": lots, 'categories': Category.objects.all(), 't_Now': datetime.now()})
+
+
+# Lot.objects.order_by(F('price').desc(nulls_last=True))             Lot.objects.order_by('-price')     Lot.objects.order_by(F('price').desc(nulls_first=True))
 
 def category(request, category):
-    category_object = Category.objects.filter(category=category).first()
+    timenow = datetime.now()
+    # print(category)
+    # category_object = Category.objects.filter(category=category).first()
     return render(request, "auctions/index.html",
-                  {"lots": Lot.objects.filter(category=category_object).all().order_by('-price'), 'categories': Category.objects.all(),
+                  {"lots": Lot.objects.filter(category__category=category).annotate(
+        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                       output_field=IntegerField())).distinct().order_by('lot_order'),
+                   'categories': Category.objects.all(),
                    'category': category.title(), 't_Now': datetime.now()})
 
 
@@ -128,7 +143,7 @@ def create_lot(request):
             rec.save()
             user = User.objects.get(pk=int(request.user.id))
             user.userLot.add(rec)
-            lotsuser = user.userLot.all()
+            # lotsuser = user.userLot.all()
             # for lot in lotsuser:
             # print(lot.lot_name)
             return HttpResponseRedirect(reverse("index"))
@@ -157,30 +172,50 @@ def lot(request, lot_id):
     class Bid_forms(forms.Form):
         bid = forms.IntegerField(label="Bid:", min_value=min_value, initial=initial)
 
+    class Comment_forms(forms.Form):
+        comment = forms.CharField(label="Сomment:", widget=forms.Textarea)
+
     if request.method == "POST":
+        print(request.POST)
         if request.user.is_authenticated:
             user = User.objects.get(pk=int(request.user.id))
-            form = Bid_forms(request.POST)
-            if form.is_valid():
-                recBid = Bid(
-                    user=user,
-                    price=form.cleaned_data['bid'],
-                    time_lot=datetime.now() + timedelta(hours=1.5)
-                )
-                recBid.save()
-                lot.price.add(recBid)
-                lot.time_sales = datetime.now() + timedelta(hours=1.5)
-                lot.save()
+            if 'bid' in request.POST:
+                form = Bid_forms(request.POST)
+                if form.is_valid():
+                    print('valid')
+                    recBid = Bid(
+                        user=user,
+                        price=form.cleaned_data['bid'],
+                        time_lot=datetime.now() + timedelta(hours=1.5)
+                    )
+                    recBid.save()
+                    lot.price.add(recBid)
+                    lot.time_sales = datetime.now() + timedelta(hours=1.5)
+                    lot.save()
 
-                # lot.starting_price = form.cleaned_data["starting_price"]
-                # lot.save()
-                return HttpResponseRedirect(reverse('lot', args=(lot_id,)))
-            else:
-                return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
+                    # lot.starting_price = form.cleaned_data["starting_price"]
+                    # lot.save()
+                    return HttpResponseRedirect(reverse('lot', args=(lot_id,)))
+                else:
+                    return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
+            if 'comment' in request.POST:
+                form = Comment_forms(request.POST)
+                if form.is_valid():
+                    print('valid')
+                    recComit=Comit(
+                        user=user,
+                        comit=form.cleaned_data['comment']
+                    )
+                    recComit.save()
+                    lot.user_comit.add(recComit)
+                    lot.save()
+                    return HttpResponseRedirect(request.path)
+                else:
+                    return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
         else:
             return HttpResponseRedirect(reverse("registerlot", args=(lot_id,)))
     return render(request, "auctions/lot_page.html",
-                  {"lot": lot, "form": Bid_forms, 'categories': Category.objects.all(),
+                  {"lot": lot, "form": Bid_forms, "comment_forms": Comment_forms, 'categories': Category.objects.all(),
                    't_Now': datetime.now()})
 
 #

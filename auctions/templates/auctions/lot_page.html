@@ -2,7 +2,7 @@
 
 {% block body %}
 
-
+{{lot.id}}
             <h2>{{lot.lot_name}}</h2>
             {% if user.is_authenticated %}
                 {% if user.id == lot.userLot.id%}
@@ -36,7 +36,21 @@
                 <h5> {{bid.price}} {{bid.user}}</h5>
             {% endfor %}
             {%endif%}
+            {% for c_t in lot.user_comit.all %}
+            {{c_t.user}}: {{c_t.comit}}
+            {% endfor %}
 <h3>Last bid{{lot.price.all.last.price}}</h3>
+            <form action="{% url 'lot' lot.id %}" method="post">
+                {% csrf_token %}
+                {{comment_forms}}
+            <input type="submit" value="Comment"/>
+            </form>
+
+<script>
+    jQuery('input[type="submit"]').on('click', function() {
+jQuery('input[type="text"], textarea').val('');
+})
+</script>
 
 
 {% endblock %}
