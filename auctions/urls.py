@@ -12,3 +12,4 @@ urlpatterns = [
     path("register/<int:lot_id>", views.register, name="registerlot"),
     path("create_lot", views.create_lot, name='create_lot')
 ]
+

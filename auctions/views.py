@@ -57,7 +57,7 @@ def category(request, category):
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
                        output_field=IntegerField())).distinct().order_by('lot_order'),
                    'categories': Category.objects.all(),
-                   'category': category.title(), 't_Now': datetime.now()})
+                   'category': category.title(), 't_Now': timenow})
 
 
 def login_view(request):
