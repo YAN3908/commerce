@@ -9,17 +9,31 @@ body {
  }
 
 .wrapper {
-        width: 300px;
-        height: 300px;
+    width: 300px;
+    height: 300px;
 
-      }
-.exmpl {
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-.exmpl img {
-        height: 100%;
-        width: auto;
-      }
+}
+
+#hammer {
+  position: absolute;
+  margin-top: -600px;
+  margin-left: -380px;
+  width: 100px;
+
+  animation: mymove 2s infinite;
+}
+@keyframes mymove {
+
+  5% {margin-top: -550px;}
+  5%{transform: rotate(-20deg);}
+}
+
+
+#sold {
+  position: absolute;
+  margin-top: -450px;
+  margin-left: -350px;
+  width: 200px;
+}
+
+

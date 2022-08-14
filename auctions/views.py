@@ -33,7 +33,7 @@ def index(request):
     timenow = datetime.now()
     lots = Lot.objects.annotate(
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
-                       output_field=IntegerField())).distinct().order_by('lot_order')
+                       output_field=IntegerField())).distinct().order_by('lot_order','time_sales')
     # print(lots.lot_order)
     # for lot in lots:
     #     print(f"{lot.lot_order} - {lot.id}")
