@@ -20,12 +20,17 @@ from django.db.models import Q
 # schedule.every(59).seconds.do(job_with_argument, name="Peter")
 
 class NewLotForm(forms.Form):
-    lot_name = forms.CharField(label="Lot name:")
+    lot_name = forms.CharField(label="Lot name:", widget=forms.TextInput(attrs={'autofocus':'on'}))
+    category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()])
     description = forms.CharField(label="Description:", widget=forms.Textarea)
     starting_price = forms.IntegerField(label="Starting price:", min_value=1, max_value=99999999999999)
     picture = forms.URLField(label="URL pictures:", required=False)
     # category = forms.ChoiceField(label="Category:", choices=[(i, i.category) for i in Category.objects.all()])
-    category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()])
+
+    def __init__(self, *args, **kwargs):
+        super(NewLotForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
 
 
 def index(request):
