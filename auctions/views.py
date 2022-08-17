@@ -22,7 +22,7 @@ from django.db.models import Q
 class NewLotForm(forms.Form):
     lot_name = forms.CharField(label="Lot name:")
     description = forms.CharField(label="Description:", widget=forms.Textarea)
-    starting_price = forms.IntegerField(label="Starting price:", min_value=1)
+    starting_price = forms.IntegerField(label="Starting price:", min_value=1, max_value=99999999999999)
     picture = forms.URLField(label="URL pictures:", required=False)
     # category = forms.ChoiceField(label="Category:", choices=[(i, i.category) for i in Category.objects.all()])
     category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()])
@@ -170,7 +170,7 @@ def lot(request, lot_id):
         # print('work')
 
     class Bid_forms(forms.Form):
-        bid = forms.IntegerField(label="Bid:", min_value=min_value, initial=initial)
+        bid = forms.IntegerField(label="Bid:", min_value=min_value, max_value=99999999999999, initial=initial)
 
     class Comment_forms(forms.Form):
         comment = forms.CharField(label="Сomment:", widget=forms.Textarea)
