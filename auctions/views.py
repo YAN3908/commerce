@@ -175,19 +175,24 @@ def lot(request, lot_id):
         # print('work')
 
     class Bid_forms(forms.Form):
-        bid = forms.IntegerField(label="Bid:", min_value=min_value, max_value=99999999999999, initial=initial)
+        bid = forms.IntegerField(label=False, min_value=min_value, max_value=99999999999999, initial=initial)
 
     class Comment_forms(forms.Form):
-        comment = forms.CharField(label="Сomment:", widget=forms.Textarea)
+        comment = forms.CharField(label=False, widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}))
+        # comment = forms.CharField(label=False, widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}))
+        def __init__(self, *args, **kwargs):
+            super(Comment_forms, self).__init__(*args, **kwargs)
+            for visible in self.visible_fields():
+                visible.field.widget.attrs['class'] = 'form-control'
 
     if request.method == "POST":
-        print(request.POST)
+
         if request.user.is_authenticated:
             user = User.objects.get(pk=int(request.user.id))
             if 'bid' in request.POST:
                 form = Bid_forms(request.POST)
                 if form.is_valid():
-                    print('valid')
+
                     recBid = Bid(
                         user=user,
                         price=form.cleaned_data['bid'],
@@ -206,7 +211,7 @@ def lot(request, lot_id):
             if 'comment' in request.POST:
                 form = Comment_forms(request.POST)
                 if form.is_valid():
-                    print('valid')
+
                     recComit=Comit(
                         user=user,
                         comit=form.cleaned_data['comment']
@@ -214,7 +219,8 @@ def lot(request, lot_id):
                     recComit.save()
                     lot.user_comit.add(recComit)
                     lot.save()
-                    return HttpResponseRedirect(request.path)
+                    return HttpResponseRedirect(request.path+"#scrol")
+
                 else:
                     return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
         else:
