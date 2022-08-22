@@ -20,11 +20,12 @@ from django.db.models import Q
 # schedule.every(59).seconds.do(job_with_argument, name="Peter")
 
 class NewLotForm(forms.Form):
-    lot_name = forms.CharField(label="Lot name:", widget=forms.TextInput(attrs={'autofocus':'on'}))
+    lot_name = forms.CharField(label="Lot name:", widget=forms.TextInput(attrs={'autofocus': 'on'}))
     category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()])
     description = forms.CharField(label="Description:", widget=forms.Textarea)
     starting_price = forms.IntegerField(label="Starting price:", min_value=1, max_value=99999999999999)
     picture = forms.URLField(label="URL pictures:", required=False)
+
     # category = forms.ChoiceField(label="Category:", choices=[(i, i.category) for i in Category.objects.all()])
 
     def __init__(self, *args, **kwargs):
@@ -38,7 +39,7 @@ def index(request):
     timenow = datetime.now()
     lots = Lot.objects.annotate(
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
-                       output_field=IntegerField())).distinct().order_by('lot_order','time_sales')
+                       output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales')
     # print(lots.lot_order)
     # for lot in lots:
     #     print(f"{lot.lot_order} - {lot.id}")
@@ -59,8 +60,8 @@ def category(request, category):
     # category_object = Category.objects.filter(category=category).first()
     return render(request, "auctions/index.html",
                   {"lots": Lot.objects.filter(category__category=category).annotate(
-        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
-                       output_field=IntegerField())).distinct().order_by('lot_order'),
+                      lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                                     output_field=IntegerField())).distinct().order_by('lot_order'),
                    'categories': Category.objects.all(),
                    'category': category.title(), 't_Now': timenow})
 
@@ -177,8 +178,14 @@ def lot(request, lot_id):
     class Bid_forms(forms.Form):
         bid = forms.IntegerField(label=False, min_value=min_value, max_value=99999999999999, initial=initial)
 
+        # def __init__(self, *args, **kwargs):
+        #     super(Bid_forms, self).__init__(*args, **kwargs)
+        #     for visible in self.visible_fields():
+        #         visible.field.widget.attrs['class'] = 'form-control'
+
     class Comment_forms(forms.Form):
         comment = forms.CharField(label=False, widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}))
+
         # comment = forms.CharField(label=False, widget=forms.Textarea(attrs={'rows': 3, 'cols': 40}))
         def __init__(self, *args, **kwargs):
             super(Comment_forms, self).__init__(*args, **kwargs)
@@ -212,14 +219,14 @@ def lot(request, lot_id):
                 form = Comment_forms(request.POST)
                 if form.is_valid():
 
-                    recComit=Comit(
+                    recComit = Comit(
                         user=user,
                         comit=form.cleaned_data['comment']
                     )
                     recComit.save()
                     lot.user_comit.add(recComit)
                     lot.save()
-                    return HttpResponseRedirect(request.path+"#scrol")
+                    return HttpResponseRedirect(request.path + "#scrol")
 
                 else:
                     return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})

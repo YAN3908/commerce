@@ -1,10 +1,50 @@
-body {
 
+
+body {
+    /*background-image: url('image/hammer.png');*/
     text-align: center;
+
 }
 
 
+header{
+     /*background: url('image/auctionn.jpg') no-repeat center;
+     background-size: cover;                    */
+}
 
+
+table {
+  box-sizing: border-box;
+  width: 100%;
+  table-layout: fixed;
+}
+
+@media (max-width: 1024px) {
+div.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index:99999998;
+}
+}
+div.sticky {
+    background-color: blue;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+#chat{
+    margin-left: 3px;
+    background: url('image/say.png') no-repeat center left;
+    padding-left:25px;"
+}
+
+#chat:hover {
+    margin-left: 3px;
+    background: url('image/say_w.png') no-repeat center left;
+    background-color: grey;
+    padding-left:25px;"
+}
 
 .dropdown:hover .dropdown-menu {
     display: block;
@@ -23,6 +63,37 @@ overflow: hidden;
     transition: 0.1s;
     visibility: hidden;
 
+}
+
+@media (min-width: 374px) {
+#hammer_sm {
+  position: absolute;
+  margin-top: -10px;
+  margin-left: 115px;
+  width: 60px;
+  animation: my_move 2s infinite;
+}
+@keyframes my_move {
+
+  5% {margin-top: 10px;}
+  5%{transform: rotate(-20deg);}
+}
+}
+
+
+@media (max-width: 374px) {
+#hammer_sm {
+  position: absolute;
+  margin-top: 40px;
+  margin-left: 75px;
+  width: 60px;
+  animation: my_move 2s infinite;
+}
+@keyframes my_move {
+
+  5% {margin-top: 60px;}
+  5%{transform: rotate(-20deg);}
+}
 }
 
 #hammer {
