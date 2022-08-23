@@ -118,13 +118,9 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR + '/image'
+MEDIA_URL = '/image/'
+MEDIA_ROOT = BASE_DIR + '/image/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
-
-
