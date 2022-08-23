@@ -8,7 +8,7 @@
     {% if not lot.price.all.last or lot.time_sales > t_Now %}
         <div class="sticky">
             {% if lot.time_sales > t_Now %}
-                <img id="hammer_sm" alt="..." src="{% static 'auctions/image/hammer.png' %}">
+                <img id="hammer_sm" alt="..." src="{% static 'auctions/css/image/hammer.png' %}">
             {% endif %}
             <form action="{% url 'lot' lot.id %}" method="post">
                 {% csrf_token %}
@@ -98,7 +98,7 @@
                     </div>
                 </a>
                 <ul class="dropdown-menu">
-                    {% if user.id == lot.userLot.id%}
+                    {% if user.id == lot.userLot.id  %}
                         {%if lot.price.all.last.price %}
                             {%for bid in lot.price.all%}
                                 <li class="dropdown-item"> {{bid.user}} bid {{bid.price}}$</li>
@@ -107,7 +107,7 @@
                             <li class="dropdown-item">no bids</li>
                         {%endif%}
                     {%else%}
-                        {% if user.id == lot.price.all.last.user.id and lot.time_sales < t_Now %}
+                        {% if user.id == lot.price.all.last.user.id and lot.time_sales < t_Now and user.is_authenticated %}
                                 {{lot.userLot.email}}
                         {%else%}
                             <p>contact information is available only to the winner of the auction </p>
@@ -128,35 +128,35 @@
 
         <div class="col" style="margin-bottom: 20px">
             {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/image/no_picture.jpg' %}">
+                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
             {% else %}
                 <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
             {%endif%}
         </div>
         <div class="col" style="margin-bottom: 20px">
             {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/image/no_picture.jpg' %}">
+                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
             {% else %}
                 <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
             {%endif%}
         </div>
         <div class="col" style="margin-bottom: 20px">
             {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/image/no_picture.jpg' %}">
+                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
             {% else %}
                 <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
             {%endif%}
         </div>
         <div class="col" style="margin-bottom: 20px">
             {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/image/no_picture.jpg' %}">
+                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
             {% else %}
                 <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
             {%endif%}
         </div>
         <div class="col" style="margin-bottom: 20px">
             {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/image/no_picture.jpg' %}">
+                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
             {% else %}
                 <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
             {%endif%}
