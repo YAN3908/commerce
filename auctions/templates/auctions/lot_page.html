@@ -10,7 +10,7 @@
             {% if lot.time_sales > t_Now %}
                 <img id="hammer_sm" alt="..." src="{% static 'auctions/css/image/hammer.png' %}">
             {% endif %}
-            <form action="{% url 'lot' lot.id %}" method="post">
+            <form style="z-index:99999991" action="{% url 'lot' lot.id %}" method="post">
                 {% csrf_token %}
                 {{form}}
                 <input type="submit" value="bid" translate="no">
