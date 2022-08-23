@@ -1,4 +1,4 @@
-
+{% load static %}
 
 body {
     /*background-image: url('image/hammer.png');*/

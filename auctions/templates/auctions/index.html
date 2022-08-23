@@ -17,7 +17,7 @@
         <div  class="col" style="margin-bottom: 20px">
           <div id="card_div" class="card shadow-sm" style="padding: 10px">
                       {%if not lot.picture %}
-            <img style="height: 225px; object-fit: contain; " class="card-img-top" src= "{% static 'auctions/css/image/no_picture.jpg' %}">
+            <img style="height: 225px; object-fit: contain; " class="card-img-top" src= "{% static 'auctions/image/no_picture.jpg' %}">
             {% else %}
             <img style="height: 225px; object-fit: contain;" class="card-img-top"   src="{{lot.picture}}">
             {%endif%}
@@ -33,12 +33,12 @@
             {%if lot.time_sales > t_Now %}
 
           <p><sup style="font-size:10px">Price</sup> <mark style="font-size:25px">{{lot.price.all.last.price}} $</mark></p>
-                <img id="hammer"  alt="..." src= "{% static 'auctions/css/image/hammer.png' %}">
+                <img id="hammer"  alt="..." src= "{% static 'auctions/image/hammer.png' %}">
 <!--            <p style=" position: absolute; margin-top: -100px; margin-left: 540px; width: 180px;"> <mark style="color:red; font-size:20px" >{{lot.time_sales|timeuntil}} </mark><nobr>before auction closes</nobr></p>-->
             <small class="text-muted" style=" text-align: center; margin: 5px 13px 5px 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><nobr><mark style="color:red;">{{lot.time_sales|timeuntil}} </mark></nobr> <nobr>before auction closes</nobr></small>
                   {% else %}
                     <p style="text-align: left"><sup style="font-size:10px">Sold </sup> <mark style="font-size:25px"> {{lot.price.all.last.price}}  $</mark></p>
-                    <img id="sold" src= "{% static 'auctions/css/image/pngwing.com.png' %}">
+                    <img id="sold" src= "{% static 'auctions/image/pngwing.com.png' %}">
                   <small class="text-muted" style=" text-align: center; margin: 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><mark>{{lot.time_sales|date:"d-m-Y"}}</mark></small>
             {% endif %}
           {% else %}
