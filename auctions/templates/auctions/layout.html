@@ -26,6 +26,10 @@
       <li class="nav-item dropdown" style="z-index:99999999;">
         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="{% url 'index' %}" role="button" aria-expanded="false">Lot Listings</a>
         <ul class="dropdown-menu">
+          {% if user.is_authenticated %}
+            <li><a class="dropdown-item" href="{% url 'mylots' %}">My lots</a></li>
+            <li><a class="dropdown-item" href="{% url 'index' %}">My bids</a></li>
+          {% endif %}
           <li><a class="dropdown-item" href="{% url 'index' %}">All active Listings</a></li>
           <li><hr class="dropdown-divider"></li>
             {% for category in categories %}

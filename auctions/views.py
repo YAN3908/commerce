@@ -45,7 +45,7 @@ def index(request):
     #     print(f"{lot.lot_order} - {lot.id}")
     # print(Lot.objects.annotate(userLot__user='Yan'))
     # lots = Lot.objects.exclude(Q(price=None) | Q(time_sales__gt=datetime.now()))
-    print(lots)
+    # print(lots)
     # sales_list= Lot.objects.price.filter(price__lt=datetime.now()).all()
     # print(category)
     return render(request, "auctions/index.html",
@@ -53,6 +53,13 @@ def index(request):
 
 
 # Lot.objects.order_by(F('price').desc(nulls_last=True))             Lot.objects.order_by('-price')     Lot.objects.order_by(F('price').desc(nulls_first=True))
+
+def mylots(request):
+    lots = Lot.objects.filter(userLot=request.user)
+    return render(request, "auctions/index.html",
+                  {"lots": lots, 'categories': Category.objects.all(), 't_Now': datetime.now()})
+    # return HttpResponse(request.user)
+
 
 def category(request, category):
     timenow = datetime.now()
