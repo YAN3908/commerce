@@ -28,7 +28,7 @@
         <ul class="dropdown-menu">
           {% if user.is_authenticated %}
             <li><a class="dropdown-item" href="{% url 'mylots' %}">My lots</a></li>
-            <li><a class="dropdown-item" href="{% url 'index' %}">My bids</a></li>
+            <li><a class="dropdown-item" href="{% url 'mybids' %}">My bids</a></li>
           {% endif %}
           <li><a class="dropdown-item" href="{% url 'index' %}">All active Listings</a></li>
           <li><hr class="dropdown-divider"></li>

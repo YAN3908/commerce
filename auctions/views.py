@@ -60,6 +60,11 @@ def mylots(request):
                   {"lots": lots, 'categories': Category.objects.all(), 't_Now': datetime.now()})
     # return HttpResponse(request.user)
 
+def mybids(request):
+    lots = Lot.objects.filter(price__user=request.user)
+    return render(request, "auctions/index.html",
+                  {"lots": lots, 'categories': Category.objects.all(), 't_Now': datetime.now()})
+    # return HttpResponse(request.user)
 
 def category(request, category):
     timenow = datetime.now()
