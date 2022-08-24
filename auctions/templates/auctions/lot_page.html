@@ -12,9 +12,9 @@
             {% endif %}
             <form action="{% url 'lot' lot.id %}" method="post">
                 {% csrf_token %}
-
+                <div style="display: inline-block; background-color: white;">
                 {{form}}
-
+                </div>
                 <input type="submit" value="bid" translate="no">
 
             </form>
