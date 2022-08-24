@@ -170,7 +170,7 @@
                 <div id="scrol" style=" margin: 5px; border: 1px solid rgb(240, 240, 240); border-top-left-radius: 5px; border-top-right-radius: 5px; height: 300px; background-color: rgb(240, 240, 245); padding: 10px; overflow-x: hidden; overflow-y: scroll;">
                     {% for c_t in lot.user_comit.all %}
                         <p style="text-align: left;">
-                            <span style="color:blue; font-weight:bold; text-decoration: underline;">{{c_t.user}}</span>: {{c_t.comit}}
+                            <span translate="no" style="color:blue; font-weight:bold; text-decoration: underline;">{{c_t.user}}</span>: {{c_t.comit}}
                         </p>
                     {% endfor %}
                 </div>
