@@ -61,7 +61,7 @@ def mylots(request):
     # return HttpResponse(request.user)
 
 def mybids(request):
-    lots = Lot.objects.filter(price__user=request.user)
+    lots = Lot.objects.filter(price__user=request.user).distinct()
     return render(request, "auctions/index.html",
                   {"lots": lots, 'categories': Category.objects.all(), 't_Now': datetime.now()})
     # return HttpResponse(request.user)
