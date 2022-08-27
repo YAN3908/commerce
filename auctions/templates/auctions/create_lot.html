@@ -2,13 +2,20 @@
 
 {% block body %}
 <main>
+        {% if message %}
+            <div>{{ message }}</div>
+        {% endif %}
     <div class="container" style="max-width: 800px;">
         <h2>Greate a lot</h2>
-        <form action="{% url 'create_lot' %}" method="post">
+        <form action="{% url 'create_lot' %}" method="post" enctype= "multipart/form-data">
         {% csrf_token %}
-        {% for field in form %}
+        {% for field in form  %}
+
+
            {{field.label_tag}}
             <div class="form-group">{{field}}</div>
+
+
            {% endfor %}
         <input class="btn btn-primary" type="submit" value="Create lot">
         </form>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from .models import Lot, Category, Bid, Comit
+from .models import Lot, Category, Bid, Comit, Imagetab
 
 # Register your models here.
 class users_bid(admin.ModelAdmin):
@@ -16,6 +16,7 @@ admin.site.register(Category)
 admin.site.register(Lot, users_bid)
 admin.site.register(User)
 admin.site.register(Comit)
+admin.site.register(Imagetab)
 
 
 

@@ -131,42 +131,17 @@
 </div>
 <div class="container" style="max-width: 1600px;">
     <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3 g-3">
-
-        <div class="col" style="margin-bottom: 20px">
-            {%if not lot.picture %}
+        {%if not lot.image.all.last %}
+            <div class="col" style="margin-bottom: 20px">
                 <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
-            {%endif%}
-        </div>
-        <div class="col" style="margin-bottom: 20px">
-            {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
-            {%endif%}
-        </div>
-        <div class="col" style="margin-bottom: 20px">
-            {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
-            {%endif%}
-        </div>
-        <div class="col" style="margin-bottom: 20px">
-            {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
-            {%endif%}
-        </div>
-        <div class="col" style="margin-bottom: 20px">
-            {%if not lot.picture %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-                <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{lot.picture}}">
-            {%endif%}
-        </div>
+            </div>
+        {% else %}
+            {% for img in lot.image.all %}
+                <div class="col" style="margin-bottom: 20px">
+                    <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{img.uploadimage.url}}">
+                </div>
+            {%endfor%}
+        {%endif%}
 
         <div class="col">
             <div style="border: 1px solid #ACACAC; border-radius: 5px;">
