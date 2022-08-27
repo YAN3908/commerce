@@ -27,7 +27,7 @@ class NewLotForm(forms.Form):
     description = forms.CharField(label="Description:", widget=forms.Textarea(attrs={'class': 'form-control'}))
     starting_price = forms.IntegerField(label="Starting price:", min_value=1, max_value=99999999999999, widget=forms.NumberInput(attrs={'class': 'form-control'}) )
     # picture = forms.URLField(label="URL pictures:", required=False)
-    uploadimage = forms.ImageField(label="Up to five images can be uploaded.", widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    uploadimage = forms.ImageField(label="Up to five images can be uploaded.", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
     # image_img1 = forms.ImageField(label='') attrs={'class': 'lotUp formElemInlineHeight'}
     # image_url2 = forms.URLField(label="URL pictures:", required=False)
