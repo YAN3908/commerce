@@ -88,7 +88,7 @@ def mylots(request):
     lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
 
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'category': 'My lots', 'categories': Category.objects.all(), 't_Now': timenow})
     # return HttpResponse(request.user)
 
 
@@ -102,7 +102,7 @@ def mybids(request):
     lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
 
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'category': 'My bids', 'categories': Category.objects.all(), 't_Now': timenow})
 
 def category(request, category):
     timenow = datetime.now()
@@ -113,7 +113,7 @@ def category(request, category):
     lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
 
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'category': category.title(), 'categories': Category.objects.all(), 't_Now': timenow})
 
     # print(category)
     # category_object = Category.objects.filter(category=category).first()
