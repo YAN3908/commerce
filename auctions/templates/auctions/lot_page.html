@@ -138,7 +138,9 @@
         {% else %}
             {% for img in lot.image.all %}
                 <div class="col" style="margin-bottom: 20px">
-                    <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{img.uploadimage.url}}">
+                    <a href="{{img.uploadimage.url}}">
+                        <img class="card-img-top" style="border: 1px solid #ACACAC; border-radius: 5px;" src="{{img.uploadimage.url}}">
+                    </a>
                 </div>
             {%endfor%}
         {%endif%}

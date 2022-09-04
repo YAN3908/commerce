@@ -14,54 +14,6 @@
           <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3 g-3">
 
 
-{% for lot in lots_bid%}
-<a href="{% url 'lot' lot.id %}" style="text-decoration: none;">
-        <div  class="col" style="margin-bottom: 20px">
-          <div id="card_div" class="card shadow-sm" style="padding: 10px">
-                      {%if not lot.image.all.last %}
-            <img style="height: 225px; object-fit: contain; " class="card-img-top" src= "{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-            <img style="height: 225px; object-fit: contain;" class="card-img-top"   src="{{lot.image.all.first.uploadimage.url}}">
-            {%endif%}
-<!--            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>-->
-
-            <div class="card-body">
-                <div style="height: 60px; text-align: center">
-                <h5>{{lot.lot_name}}</h5>
-                    </div>
-<!--              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>-->
-              <div class="d-flex justify-content-between align-items-center" style="height: 90px;">
-            {% if lot.price.all.last %}
-            {%if lot.time_sales > t_Now %}
-
-          <p><sup style="font-size:10px">Price</sup> <mark style="font-size:25px">{{lot.price.all.last.price}} $</mark></p>
-                <img id="hammer"  alt="..." src= "{% static 'auctions/css/image/hammer.png' %}">
-<!--            <p style=" position: absolute; margin-top: -100px; margin-left: 540px; width: 180px;"> <mark style="color:red; font-size:20px" >{{lot.time_sales|timeuntil}} </mark><nobr>before auction closes</nobr></p>-->
-            <small class="text-muted" style=" text-align: center; margin: 5px 13px 5px 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><nobr><mark style="color:red;">{{lot.time_sales|timeuntil}} </mark></nobr> <nobr>before auction closes</nobr></small>
-                  {% else %}
-                    <p style="text-align: left"><sup style="font-size:10px">Sold </sup> <mark style="font-size:25px"> {{lot.price.all.last.price}}  $</mark></p>
-                    <img id="sold" src= "{% static 'auctions/css/image/pngwing.com.png' %}">
-                  <small class="text-muted" style=" text-align: center; margin: 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><mark>{{lot.time_sales|date:"d-m-Y"}}</mark></small>
-            {% endif %}
-          {% else %}
-          <p><sup style="font-size:10px">Price:</sup> <mark style="font-size:25px" > {{lot.starting_price}} $</mark></p>
-                  <small class="text-muted" style=" text-align: center; margin: 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><mark style="color:green;">There were no bids.</mark></small>
-            {% endif %}
-            {% if not category%}
-<!--            <p style="text-align: left; position: absolute; bottom: 5px;" >{{lot.category.category}}</p>-->
-                    <object style=" position: absolute; bottom: 10px; left: 10px;">
-                        <a href = "/category/{{lot.category.category}}">
-                  <button  type="button" class="btn btn-sm btn-outline-secondary" >{{lot.category.category}}</button>
-                    </a>
-                    </object>
-            {%endif%}
-              </div>
-            </div>
-          </div>
-        </div>
-</a>
-{% endfor %}
-
 {% for lot in lots%}
 <a href="{% url 'lot' lot.id %}" style="text-decoration: none;">
         <div  class="col" style="margin-bottom: 20px">
@@ -110,57 +62,47 @@
 </a>
 {% endfor %}
 
-{% for lot in lots_sale%}
-<a href="{% url 'lot' lot.id %}" style="text-decoration: none;">
-        <div  class="col" style="margin-bottom: 20px">
-          <div id="card_div" class="card shadow-sm" style="padding: 10px">
-                      {%if not lot.image.all.last %}
-            <img style="height: 225px; object-fit: contain; " class="card-img-top" src= "{% static 'auctions/css/image/no_picture.jpg' %}">
-            {% else %}
-            <img style="height: 225px; object-fit: contain;" class="card-img-top"   src="{{lot.image.all.first.uploadimage.url}}">
-            {%endif%}
-<!--            <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>-->
 
-            <div class="card-body">
-                <div style="height: 60px; text-align: center">
-                <h5>{{lot.lot_name}}</h5>
-                    </div>
-<!--              <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>-->
-              <div class="d-flex justify-content-between align-items-center" style="height: 90px;">
-            {% if lot.price.all.last %}
-            {%if lot.time_sales > t_Now %}
-
-          <p><sup style="font-size:10px">Price</sup> <mark style="font-size:25px">{{lot.price.all.last.price}} $</mark></p>
-                <img id="hammer"  alt="..." src= "{% static 'auctions/css/image/hammer.png' %}">
-<!--            <p style=" position: absolute; margin-top: -100px; margin-left: 540px; width: 180px;"> <mark style="color:red; font-size:20px" >{{lot.time_sales|timeuntil}} </mark><nobr>before auction closes</nobr></p>-->
-            <small class="text-muted" style=" text-align: center; margin: 5px 13px 5px 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><nobr><mark style="color:red;">{{lot.time_sales|timeuntil}} </mark></nobr> <nobr>before auction closes</nobr></small>
-                  {% else %}
-                    <p style="text-align: left"><sup style="font-size:10px">Sold </sup> <mark style="font-size:25px"> {{lot.price.all.last.price}}  $</mark></p>
-                    <img id="sold" src= "{% static 'auctions/css/image/pngwing.com.png' %}">
-                  <small class="text-muted" style=" text-align: center; margin: 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><mark>{{lot.time_sales|date:"d-m-Y"}}</mark></small>
-            {% endif %}
-          {% else %}
-          <p><sup style="font-size:10px">Price:</sup> <mark style="font-size:25px" > {{lot.starting_price}} $</mark></p>
-                  <small class="text-muted" style=" text-align: center; margin: 5px; width: 120px; position: absolute; bottom: 0; right: 0;" ><mark style="color:green;">There were no bids.</mark></small>
-            {% endif %}
-            {% if not category%}
-<!--            <p style="text-align: left; position: absolute; bottom: 5px;" >{{lot.category.category}}</p>-->
-                    <object style=" position: absolute; bottom: 10px; left: 10px;">
-                        <a href = "/category/{{lot.category.category}}">
-                  <button  type="button" class="btn btn-sm btn-outline-secondary" >{{lot.category.category}}</button>
-                    </a>
-                    </object>
-            {%endif%}
-              </div>
-            </div>
-          </div>
-        </div>
-</a>
-{% endfor %}
 
       </div>
     </div>
   </div>
+
+
+{% if lots.has_other_pages%}
+    <nav aria-label="Page navigation example" >
+        <ul class="pagination justify-content-center">
+            {%if lots.number > 3 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ lots.previous_page_number }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+
+            {% for p in lots.paginator.page_range%}
+                {% if lots.number == p%}
+                    <li class="page-item active">
+                        <a class="page-link" href="?page={{p}}">{{p}}</a>
+                    </li>
+                {% elif p >= lots.number|add:-2 and p <= lots.number|add:2 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{p}}">{{p}}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {%if lots.number < lots.paginator.num_pages|add:-2 %}
+
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ lots.next_page_number }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
 
 </main>
 <footer class="text-muted py-5">

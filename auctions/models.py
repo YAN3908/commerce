@@ -15,16 +15,25 @@ class User(AbstractUser):
 class Category(models.Model):
     category = models.CharField(max_length=64)
 
+    def __str__(self):
+        return f"{self.category.title()} "
+
 
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="biduser")
     price = models.IntegerField()
     time_lot = models.DateTimeField(default=(datetime.now))
 
+    def __str__(self):
+        return f"{self.user}({self.price}$)"
+
 
 class Comit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comituser")
     comit = models.TextField()
+
+    def __str__(self):
+        return f"{self.user} "
 
 
 class Imagetab(models.Model):
@@ -50,12 +59,12 @@ class Lot(models.Model):
     userLot = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userLot")
     user_comit = models.ManyToManyField(Comit, blank=True, related_name="usercomit")
     time_lot = models.DateTimeField(default=datetime.now)
-    time_sales = models.DateTimeField(default=datetime.now)
+    time_sales = models.DateTimeField(default=datetime(1, 1, 1, 0, 0))
     sale = models.BooleanField(default=False)  # not used
+    # class Meta:
+    #     Verbose_name = 'Лоты'
 
     # def save(self, *args, **kwargs):
     #     if datetime.now() >= self.time_sales:
     #         self.sale = True
     #     super(Lot, self).save(*args, **kwargs)
-
-    # , default = "uploads/default.jpg"

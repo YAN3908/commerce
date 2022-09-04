@@ -1,14 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import F, Case, When, Value, IntegerField, Q
 from django import forms
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from datetime import datetime, timedelta
 from .models import User, Lot, Category, Bid, Comit, Imagetab
-
 
 
 # import schedule
@@ -19,101 +20,172 @@ from .models import User, Lot, Category, Bid, Comit, Imagetab
 #
 # schedule.every(59).seconds.do(job_with_argument, name="Peter")
 
-# class NewLotForm(forms.ModelForm):
-class NewLotForm(forms.Form):
+class NewLotForm(forms.ModelForm):
+    uploadimage = forms.ImageField(label="Up to five images can be uploaded.", required=False,
+                                   widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
-    lot_name = forms.CharField(label="Lot name:", widget=forms.TextInput(attrs={'autofocus': 'on', 'class': 'form-control'}))
-    category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()], widget=forms.Select(attrs={'class':'form-control'}))
-    description = forms.CharField(label="Description:", widget=forms.Textarea(attrs={'class': 'form-control'}))
-    starting_price = forms.IntegerField(label="Starting price:", min_value=1, max_value=99999999999999, widget=forms.NumberInput(attrs={'class': 'form-control'}) )
-    # picture = forms.URLField(label="URL pictures:", required=False)
-    uploadimage = forms.ImageField(label="Up to five images can be uploaded.", required=False, widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].empty_label = "Add category"
+        # self.fields['category'].attrs={'class': 'form-control'}
+        # def __init__(self, queryset, empty_label=u"---------", cache_choices=False,
+        #              required=True, widget=None, label=None, initial=None,
+        #              help_text=None, to_field_name=None, *args, **kwargs):
 
-    # image_img1 = forms.ImageField(label='') attrs={'class': 'lotUp formElemInlineHeight'}
-    # image_url2 = forms.URLField(label="URL pictures:", required=False)
-    # image_img2 = forms.ImageField(label='')
-    # image_url3 = forms.URLField(label="URL pictures:", required=False)
-    # image_img3 = forms.ImageField(label='')
-    # image_url4 = forms.URLField(label="URL pictures:", required=False)
-    # image_img4 = forms.ImageField(label='')
-    # image_url5 = forms.URLField(label="URL pictures:", required=False)
-    # image_img5 = forms.ImageField(label='')
-    # class Meta:
-    #     model = Lot
-    #     fields = ('lot_name',)
+    class Meta:
+        model = Lot
+        fields = ['lot_name', 'category', 'description', 'starting_price']
+        widgets = {
+            'lot_name': forms.TextInput(attrs={'autofocus': 'on', 'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'starting_price': forms.NumberInput(attrs={'class': 'form-control'}),
+            # 'image': forms.ClearableFileInput(attrs={'multiple': True})
+        }
 
 
-    # class Meta:
-    #     model = Imagetab
-    #     fields = ('uploadimage',)
-        # fields = '__all__'
+# class NewLotForm(forms.Form):
+#     lot_name = forms.CharField(label="Lot name:",
+#                                widget=forms.TextInput(attrs={'autofocus': 'on', 'class': 'form-control'}))
+#     category = forms.ChoiceField(label="Category:", choices=[(i.id, i.category) for i in Category.objects.all()],
+#                                  widget=forms.Select(attrs={'class': 'form-control'}))
+#     description = forms.CharField(label="Description:", widget=forms.Textarea(attrs={'class': 'form-control'}))
+#     starting_price = forms.IntegerField(label="Starting price:", min_value=1, max_value=99999999999999,
+#                                         widget=forms.NumberInput(attrs={'class': 'form-control'}))
+#     # picture = forms.URLField(label="URL pictures:", required=False)
+#     uploadimage = forms.ImageField(label="Up to five images can be uploaded.", required=False,
+#                                    widget=forms.ClearableFileInput(attrs={'multiple': True}))
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['category'].empty_label = "Категория не выбрана"
 
-    # category = forms.ChoiceField(label="Category:", choices=[(i, i.category) for i in Category.objects.all()])
+# image_img1 = forms.ImageField(label='') attrs={'class': 'lotUp formElemInlineHeight'}
+# image_url2 = forms.URLField(label="URL pictures:", required=False)
+# image_img2 = forms.ImageField(label='')
+# image_url3 = forms.URLField(label="URL pictures:", required=False)
+# image_img3 = forms.ImageField(label='')
+# image_url4 = forms.URLField(label="URL pictures:", required=False)
+# image_img4 = forms.ImageField(label='')
+# image_url5 = forms.URLField(label="URL pictures:", required=False)
+# image_img5 = forms.ImageField(label='')
+# class Meta:
+#     model = Lot
+#     fields = ('lot_name',)
 
-    # def __init__(self, *args, **kwargs):
-    #     super(NewLotForm, self).__init__(*args, **kwargs)
-    #     for visible in self.visible_fields():
-    #         visible.field.widget.attrs['class'] = 'form-control'
+# class Meta:
+#     model = Imagetab
+#     fields = ('uploadimage',)
+# fields = '__all__'
+
+# category = forms.ChoiceField(label="Category:", choices=[(i, i.category) for i in Category.objects.all()])
+
+# def __init__(self, *args, **kwargs):
+#     super(NewLotForm, self).__init__(*args, **kwargs)
+#     for visible in self.visible_fields():
+#         visible.field.widget.attrs['class'] = 'form-control'
 
 
 def index(request):
-    # print(request)
-    # lots = Lot.objects.filter(Q(price=None) | Q(time_sales__gt=datetime.now()))
     timenow = datetime.now()
+    # print(request)
+    # lots= Lot.objects.all().order_by(F('price').asc(nulls_last=True))
+    # lots = Lot.objects.all().order_by(Coalesce('price', 'time_lot').desc(nulls_first=True))
+    # lots = Lot.objects.filter(Q(price=None) | Q(time_sales__gt=datetime.now())).order_by(
+    #     F('price').asc(nulls_last=True), 'time_sales', '-time_lot')
+    # lots = Lot.objects.all().order_by('time_sales', 'time_lot').reverse()
+    # lots = Lot.objects.values('time_sales').annotate()
+    # Lot.objects.filter(time_sales__lt=timenow).update(sale=False)
+
     # lots = Lot.objects.annotate(
-    #     lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
-    #                    output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales')
+    #     lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=None,
+    #                    output_field=IntegerField())).distinct().order_by(F('lot_order').asc(nulls_last=True),
+    #                                                                      'time_sales', '-time_lot', )
+
+    lots = Lot.objects.annotate(
+        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                       output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
+
+    # lots = Lot.objects.extra(select={'val': "time_sales = %s"}, select_params=(datetime(1, 1, 1, 0, 0),),)
+
     # print(lots.lot_order)
     # for lot in lots:
     #     print(f"{lot.lot_order} - {lot.id}")
     # print(Lot.objects.annotate(userLot__user='Yan'))
-    lots_sale = Lot.objects.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
-    lots = Lot.objects.filter(price=None).order_by('-time_sales')
-    lots_bid = Lot.objects.filter(time_sales__gt=timenow).order_by('time_sales')
+
+    # lots_sale = Lot.objects.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
+    # lots = Lot.objects.filter(price=None).order_by('-time_sales')
+    # lots_bid = Lot.objects.filter(time_sales__gt=timenow).order_by('time_sales')
+
     # print(lots)
     # sales_list= Lot.objects.price.filter(price__lt=datetime.now()).all()
     # print(category)
+    paginator = Paginator(lots, 15)
+    page_number=request.GET.get('page')
+    page_object=paginator.get_page(page_number)
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": page_object, 'categories': Category.objects.all(), 't_Now': timenow})
+    # return render(request, "auctions/index.html",
+    #               {"lots": lots, 'categories': Category.objects.all(), 't_Now': timenow})
+#
 
 
 # Lot.objects.order_by(F('price').desc(nulls_last=True))             Lot.objects.order_by('-price')     Lot.objects.order_by(F('price').desc(nulls_first=True))
 
 def mylots(request):
     timenow = datetime.now()
-    lots_all = Lot.objects.filter(userLot=request.user)
-
-    lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
-    lots = lots_all.filter(price=None).order_by('-time_sales')
-    lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
-
+    # lots_all = Lot.objects.filter(userLot=request.user)
+    lots = Lot.objects.filter(userLot=request.user).annotate(
+        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                       output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
+    # lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
+    # lots = lots_all.filter(price=None).order_by('-time_sales')
+    # lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
+    paginator = Paginator(lots, 15)
+    page_number=request.GET.get('page')
+    page_object=paginator.get_page(page_number)
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'category': 'My lots', 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": page_object,  'category': 'My lots',
+                   'categories': Category.objects.all(), 't_Now': timenow})
     # return HttpResponse(request.user)
 
 
 def mybids(request):
     # lots = Lot.objects.filter(price__user=request.user).distinct()
     timenow = datetime.now()
-    lots_all = Lot.objects.filter(price__user=request.user).distinct()
+    # lots_all = Lot.objects.filter(price__user=request.user).distinct()
+    #
+    # lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
+    # lots = lots_all.filter(price=None).order_by('-time_sales')
+    # lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
 
-    lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
-    lots = lots_all.filter(price=None).order_by('-time_sales')
-    lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
-
+    lots = Lot.objects.filter(price__user=request.user).distinct().annotate(
+        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                       output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
+    paginator = Paginator(lots, 15)
+    page_number=request.GET.get('page')
+    page_object=paginator.get_page(page_number)
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'category': 'My bids', 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": page_object, 'category': 'My bids',
+                   'categories': Category.objects.all(), 't_Now': timenow})
+
 
 def category(request, category):
     timenow = datetime.now()
-    lots_all = Lot.objects.filter(category__category=category)
-
-    lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
-    lots = lots_all.filter(price=None).order_by('-time_sales')
-    lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
-
+    # lots_all = Lot.objects.filter(category__category=category)
+    #
+    # lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
+    # lots = lots_all.filter(price=None).order_by('-time_sales')
+    # lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
+    lots = Lot.objects.filter(category__category=category).annotate(
+        lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
+                       output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
+    paginator = Paginator(lots, 6)
+    page_number=request.GET.get('page')
+    page_object=paginator.get_page(page_number)
     return render(request, "auctions/index.html",
-                  {"lots": lots, "lots_sale": lots_sale, "lots_bid": lots_bid, 'category': category.title(), 'categories': Category.objects.all(), 't_Now': timenow})
+                  {"lots": page_object, 'category': category.title(),
+                   'categories': Category.objects.all(), 't_Now': timenow})
 
     # print(category)
     # category_object = Category.objects.filter(category=category).first()
@@ -200,7 +272,6 @@ def create_lot(request):
     #     form = NewLotForm()
     #     return render(request, "auctions/create_lot.html", {'form': form, 'categories': Category.objects.all(), 'images': Imagetab.objects.all()})
 
-
     user = User.objects.get(pk=int(request.user.id))
 
     if request.method == "POST":
@@ -211,7 +282,7 @@ def create_lot(request):
         if form.is_valid():
             if len(files) > 5:
                 return render(request, "auctions/create_lot.html", {'form': form, 'categories': Category.objects.all(),
-                    "message": "Only five images allowed."})
+                                                                    "message": "Only five images allowed."})
             else:
                 # print(files)
                 rec = Lot(
@@ -220,8 +291,8 @@ def create_lot(request):
                     starting_price=form.cleaned_data['starting_price'],
                     # picture=form.cleaned_data['picture'],
                     # price=Bid.objects.filter(user=user, price=form.cleaned_data['starting_price']),
-                    # category=form.cleaned_data['category'],
-                    category=Category.objects.filter(pk=form.cleaned_data['category']).first(),
+                    category=form.cleaned_data['category'],
+                    # category=Category.objects.filter(pk=form.cleaned_data['category']).first(),
                     userLot=user
                 )
                 rec.save()
@@ -239,10 +310,12 @@ def create_lot(request):
         else:
             return render(request, "auctions/create_lot.html", {'form': form, 'categories': Category.objects.all()})
 
-    return render(request, "auctions/create_lot.html", {'form': NewLotForm, 'categories': Category.objects.all(), 'images': Imagetab.objects.all()})
+    return render(request, "auctions/create_lot.html",
+                  {'form': NewLotForm, 'categories': Category.objects.all(), 'images': Imagetab.objects.all()})
 
 
 def lot(request, lot_id):
+    print(request)
     lot = Lot.objects.filter(pk=int(lot_id)).first()
 
     # if delta_time < timedelta(hours=0):
