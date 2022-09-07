@@ -26,9 +26,13 @@
             {{form}}
             <input class="btn btn-primary" type="submit" value="Register">
         </form>
-
+        <div>
+<a title="Google" class="socialaccount_provider google" href="/accounts/google/login/?process=login">Google</a>
+        </div>
         Already have an account? <a href="{% url 'login' %}">Log In here.</a>
     </div>
+
+
 
 </main>
 
@@ -38,3 +42,12 @@
   </div>
 </footer>
 {% endblock %}
+
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+         data-client_id="974908331819-14snbd1r49vf120v5p2vja6mksvd48vr.apps.googleusercontent.com"
+         data-ux_mode="redirect"
+         data-login_uri="http://localhost:8000/admin/auctions/user/">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>

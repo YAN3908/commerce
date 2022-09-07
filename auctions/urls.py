@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -14,5 +14,6 @@ urlpatterns = [
                   path("logout", views.logout_view, name="logout"),
                   path("register", views.register, name="register"),
                   path("register/<int:lot_id>", views.register, name="registerlot"),
-                  path("create_lot", views.create_lot, name='create_lot')
+                  path("create_lot", views.create_lot, name='create_lot'),
+                  path('accounts/', include('allauth.urls')),
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
