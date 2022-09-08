@@ -48,6 +48,8 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_QUERY_EMAIL = True
 LOGIN_REDIRECT_URL = "index"
 
+ACCOUNT_FORMS = {'login': 'auctions.forms.LoginForm', 'signup': 'auctions.forms.SignupForm'}
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

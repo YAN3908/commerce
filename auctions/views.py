@@ -248,7 +248,7 @@ def register(request, lot_id=0):
             return render(request, "auctions/register.html", {
                 "message": "Username already taken.", "form": form
             })
-        login(request, user)
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
         page = request.POST["page"]
         if page == '0':

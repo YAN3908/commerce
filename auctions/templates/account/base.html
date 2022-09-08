@@ -1,0 +1,33 @@
+{% extends "auctions/layout.html" %}
+
+    {% block body %}
+
+    {% if messages %}
+    <div>
+      <strong>Messages:</strong>
+
+        {% for message in messages %}
+        <div>{{message}}</div>
+        {% endfor %}
+
+    </div>
+    {% endif %}
+
+    <div>
+<!--      <strong>Menu:</strong>-->
+
+        {% if user.is_authenticated %}
+        <div><a href="{% url 'account_email' %}">Change E-mail</a></div>
+        <div><a href="{% url 'account_logout' %}">Sign Out</a></div>
+        {% else %}
+        <div><a href="{% url 'account_login' %}">Sign In</a></div>
+        <div><a href="{% url 'account_signup' %}">Sign Up</a></div>
+
+        {% endif %}
+
+    </div>
+    {% block content %}
+    {% endblock %}
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
