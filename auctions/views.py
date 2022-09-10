@@ -87,6 +87,10 @@ class NewLotForm(forms.ModelForm):
 
 
 def index(request):
+    if "page" in request.session:
+        page = request.session["page"]
+        del request.session['page']
+        return HttpResponseRedirect(reverse("lot", args=(page,)))
     timenow = datetime.now()
     # print(request)
     # lots= Lot.objects.all().order_by(F('price').asc(nulls_last=True))
@@ -121,12 +125,14 @@ def index(request):
     # sales_list= Lot.objects.price.filter(price__lt=datetime.now()).all()
     # print(category)
     paginator = Paginator(lots, 15)
-    page_number=request.GET.get('page')
-    page_object=paginator.get_page(page_number)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
     return render(request, "auctions/index.html",
                   {"lots": page_object, 'categories': Category.objects.all(), 't_Now': timenow})
     # return render(request, "auctions/index.html",
     #               {"lots": lots, 'categories': Category.objects.all(), 't_Now': timenow})
+
+
 #
 
 
@@ -142,10 +148,10 @@ def mylots(request):
     # lots = lots_all.filter(price=None).order_by('-time_sales')
     # lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
     paginator = Paginator(lots, 15)
-    page_number=request.GET.get('page')
-    page_object=paginator.get_page(page_number)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
     return render(request, "auctions/index.html",
-                  {"lots": page_object,  'category': 'My lots',
+                  {"lots": page_object, 'category': 'My lots',
                    'categories': Category.objects.all(), 't_Now': timenow})
     # return HttpResponse(request.user)
 
@@ -163,8 +169,8 @@ def mybids(request):
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
                        output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
     paginator = Paginator(lots, 15)
-    page_number=request.GET.get('page')
-    page_object=paginator.get_page(page_number)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
     return render(request, "auctions/index.html",
                   {"lots": page_object, 'category': 'My bids',
                    'categories': Category.objects.all(), 't_Now': timenow})
@@ -181,8 +187,8 @@ def category(request, category):
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
                        output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
     paginator = Paginator(lots, 6)
-    page_number=request.GET.get('page')
-    page_object=paginator.get_page(page_number)
+    page_number = request.GET.get('page')
+    page_object = paginator.get_page(page_number)
     return render(request, "auctions/index.html",
                   {"lots": page_object, 'category': category.title(),
                    'categories': Category.objects.all(), 't_Now': timenow})
@@ -197,7 +203,7 @@ def category(request, category):
     #                'category': category.title(), 't_Now': timenow})
 
 
-def login_view(request):
+def login_view(request):  # not used
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -222,7 +228,7 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("index"))
 
 
-def register(request, lot_id=0):
+def register(request, lot_id=0):  # not used
     class PageInit(forms.Form):
         page = forms.IntegerField(widget=forms.HiddenInput(), initial=lot_id)
 
@@ -387,7 +393,10 @@ def lot(request, lot_id):
                 else:
                     return render(request, 'auctions/lot_page.html', {"lot": lot, "form": form})
         else:
-            return HttpResponseRedirect(reverse("registerlot", args=(lot_id,)))
+            # return HttpResponseRedirect(reverse("registerlot", args=(lot_id,)))
+            request.session["page"] = lot_id
+            return HttpResponseRedirect(reverse("account_login"))
+            # return render(request, 'account/login.html')
     return render(request, "auctions/lot_page.html",
                   {"lot": lot, "form": Bid_forms, "comment_forms": Comment_forms, 'categories': Category.objects.all(),
                    't_Now': datetime.now()})

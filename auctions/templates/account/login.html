@@ -12,8 +12,8 @@
 {% get_providers as socialaccount_providers %}
 
 {% if socialaccount_providers %}
-    <p>{% blocktrans with site.name as site_name %}Please login with
- account.{% endblocktrans %}</p>
+    {% blocktrans with site.name as site_name %}Please login with
+ account.{% endblocktrans %}
 
     {% get_providers as socialaccount_providers %}
 
@@ -30,7 +30,7 @@
             {% endif %}
 
           <a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}"
-             href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{{provider.name}}</a>
+             href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}"><h1>{{provider.name}}</h1></a>
 
         {% endfor %}
 
