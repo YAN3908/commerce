@@ -5,11 +5,118 @@ from django.db import IntegrityError
 from django.db.models import F, Case, When, Value, IntegerField, Q
 from django import forms
 from django.db.models.functions import Coalesce
+from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from datetime import datetime, timedelta
+
+from rest_framework import generics, viewsets, mixins
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
 from .models import User, Lot, Category, Bid, Comit, Imagetab
+from .permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
+from .serializers import LotSerializer
+
+
+# class LotAPIView(generics.ListAPIView):
+#     queryset = Lot.objects.all()
+#     serializer_class = LotSerializer
+
+# class LotViewSet(viewsets.ReadOnlyModelViewSet):
+# class LotViewSet(viewsets.ModelViewSet):
+# class LotViewSet(mixins.CreateModelMixin,
+#                    mixins.RetrieveModelMixin,
+#                    mixins.UpdateModelMixin,
+#                    mixins.DestroyModelMixin,
+#                    mixins.ListModelMixin,
+#                    GenericViewSet):
+#
+#     queryset = Lot.objects.all()
+#     serializer_class = LotSerializer
+
+class LotAPIList(generics.ListCreateAPIView):
+    queryset = Lot.objects.all()
+    serializer_class = LotSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+class LotAPIUpdate(generics.RetrieveUpdateAPIView):
+    queryset = Lot.objects.all()
+    serializer_class = LotSerializer
+    permission_classes = (IsOwnerOrReadOnly,)
+
+class LotAPIDestroy(generics.RetrieveDestroyAPIView):
+    queryset = Lot.objects.all()
+    serializer_class = LotSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+# class LotAPIView(APIView):
+#     def get(self, request):
+#         l = Lot.objects.all()
+#         # print(lst)
+#         return Response({'lots': LotSerializer(l, many=True).data})
+#         # return Response({'title': 'anjelina djoli'})
+
+# class LotAPIUpdate(generics.UpdateAPIView):
+#     queryset = Lot.objects.all()
+#     serializer_class = LotSerializer
+
+# class LotAPIDetailVew(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Lot.objects.all()
+#     serializer_class = LotSerializer
+
+    # def post(self, request):
+    #     serializer = LotSerializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response({'lots': serializer.data})
+    #     # post_new = Lot.objects.create(
+    #     #     lot_name=request.data['lot_name'],
+    #     #     description=request.data['description'],
+    #     #     starting_price=request.data['starting_price'],
+    #     #     category_id=request.data['category'],
+    #     #     userLot_id=request.data['userLot']
+    #     # )
+    #
+    #     # post_new = Category.objects.create(
+    #     #     category=request.data['category']
+    #     # )
+    #     # return Response({'posts': model_to_dict(post_new)})
+    #
+    #     # lst = Lot.objects.all().values
+    #     # print(lst)
+    #     # return Response({'posts': list(lst)})
+    #     # return Response({'posts': 'anj djoli'})
+    #
+    # def put(self, request, *args, **kwargs):
+    #     pk = kwargs.get("pk", None)
+    #     print(pk)
+    #     if not pk:
+    #         return Response({"error": "Method PUT not allowed"})
+    #     try:
+    #         instance = Lot.objects.get(pk=pk)
+    #         print(instance)
+    #     except:
+    #         return Response({"error": "object does not exists"})
+    #     serializer=LotSerializer(data=request.data, instance=instance)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response({'lots': serializer.data})
+
+    # def delete(self, request, *args, **kwargs):
+    #     pk = kwargs.get("pk", None)
+    #     print(pk)
+    #     if not pk:
+    #         return Response({"error": "Method DELETE not allowed"})
+    #     try:
+    #         Lot.objects.get(pk=pk).delete()
+    #     except:
+    #         return Response({"error": "object does not exists"})
+    #
+    #     return Response({'lots': "delete lot " + str(pk)})
 
 
 # import schedule
@@ -323,6 +430,9 @@ def create_lot(request):
 def lot(request, lot_id):
     print(request)
     lot = Lot.objects.filter(pk=int(lot_id)).first()
+    if not lot:
+        return HttpResponse("lot does not exists, it may have been deleted")
+
 
     # if delta_time < timedelta(hours=0):
 

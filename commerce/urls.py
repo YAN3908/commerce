@@ -17,9 +17,21 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from auctions.views import *
+from rest_framework import routers
+
+# router=routers.SimpleRouter()
+# router.register(r'lot', LotViewSet)
 
 urlpatterns = [
                   path("admin/", admin.site.urls),
                   path("", include("auctions.urls")),
-
+                  path("api/v1/drf-auth/", include('rest_framework.urls')),
+                  # path("api/v1/", include(router.urls))  #  http://127.0.0.1:8000/api/v1/lot/
+                  # path("api/v1/lotlist", LotViewSet.as_view({'get': 'list'})),
+                  # path("api/v1/lotlist/<int:pk>", LotViewSet.as_view({'put': 'update'})),
+                  # path("api/v1/lotapidetail/<int:pk>", LotAPIDetailVew.as_view())
+                  path("api/v1/lot", LotAPIList.as_view()),
+                  path("api/v1/lot/<int:pk>", LotAPIUpdate.as_view()),
+                  path("api/v1/lotapidelete/<int:pk>", LotAPIDestroy.as_view())
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
