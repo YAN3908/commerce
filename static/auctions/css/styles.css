@@ -8,8 +8,8 @@ body {
 
 
 header{
-     /*background: url('image/auctionn.jpg') no-repeat center;
-     background-size: cover;                    */
+     background: url('image/auctionn.jpg') no-repeat center;
+     background-size: cover;
 }
 
 
@@ -24,11 +24,11 @@ div.sticky {
     position: -webkit-sticky;
     position: sticky;
     top: 0;
-    z-index:99999998;
+    z-index:99999990;
 }
 }
 div.sticky {
-    background-color: blue;
+    background-color: #ccf0ff;
     margin-bottom: 10px;
     padding: 10px;
 }
