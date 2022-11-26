@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from datetime import datetime, timedelta
+import pendulum
 
 from rest_framework import generics, viewsets, mixins
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser
@@ -199,6 +200,7 @@ def index(request):
         del request.session['page']
         return HttpResponseRedirect(reverse("lot", args=(page,)))
     timenow = datetime.now()
+    # print(timenow)
     # print(request)
     # lots= Lot.objects.all().order_by(F('price').asc(nulls_last=True))
     # lots = Lot.objects.all().order_by(Coalesce('price', 'time_lot').desc(nulls_first=True))
@@ -213,9 +215,11 @@ def index(request):
     #                    output_field=IntegerField())).distinct().order_by(F('lot_order').asc(nulls_last=True),
     #                                                                      'time_sales', '-time_lot', )
 
-    lots = Lot.objects.annotate(
+    lots = Lot.objects.annotate(time_sec=(F('time_sales')-timenow),
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
                        output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
+    # print(type(lots[0].time_sec))
+    # print(lots[0].time_sec.seconds)
 
     # lots = Lot.objects.extra(select={'val': "time_sales = %s"}, select_params=(datetime(1, 1, 1, 0, 0),),)
 
@@ -290,7 +294,7 @@ def category(request, category):
     # lots_sale = lots_all.exclude(Q(price=None) | Q(time_sales__gt=timenow)).order_by('-time_sales')
     # lots = lots_all.filter(price=None).order_by('-time_sales')
     # lots_bid = lots_all.filter(time_sales__gt=timenow).order_by('time_sales')
-    lots = Lot.objects.filter(category__category=category).annotate(
+    lots = Lot.objects.filter(category__category=category).annotate(time_sec=(F('time_sales')-timenow),
         lot_order=Case(When(price=None, then=2), When(time_sales__gt=timenow, then=1), default=3,
                        output_field=IntegerField())).distinct().order_by('lot_order', 'time_sales', '-time_lot', )
     paginator = Paginator(lots, 6)
